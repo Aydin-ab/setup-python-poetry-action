@@ -8,6 +8,7 @@ branding:
 inputs:
   python-version:
     description: Python version to use
+    default: latest
   poetry-version:
     description: Poetry version to use
     required: true
@@ -23,13 +24,37 @@ runs:
       #       Install & configure Poetry       #            
       #----------------------------------------#
 
+      - name: Fetch Python Version if not provided or is "latest"
+        uses: snok/latest-python-versions@v1
+        id: get-python-versions
+        if: inputs.python-version == '' || inputs.python-version == 'latest'
+      
+      - name: Print (debug)
+        run: echo "${{ steps.get-python-versions.outputs.latest-python-versions }}"
+        shell: bash
+        if: inputs.python-version == '' || inputs.python-version == 'latest'
+      
+      # set inputs.python-version to the latest python version
+      - name: Set Python Version if version number not provided or is "latest"
+        shell: bash
+        run: |
+            latest_python=$(echo "${{ steps.determine-python.outputs.latest-python-versions }}" | jq -r '.[0]')
+            echo "python_version=$latest_python" >> $GITHUB_ENV
+        if: inputs.python-version == '' || inputs.python-version == 'latest'
+
+        
+      - name: Set Python Version if version number provided
+        shell: bash
+        run: echo "python_version=${{ inputs.python-version }}" >> $GITHUB_ENV
+        if: "${{ ! (inputs.python-version == '' || inputs.python-version == 'latest') }}"
+
       - name: Load cached .local
         id: cached-dotlocal
         uses: actions/cache@v4
         with:
           path: ~/.local
-          # use steps.setup-python.outputs.python-version so that if the provided python version is empty or "latest", it will use the appropriate version number
-          key: dotlocal-os_${{ runner.os }}-poetry${{ inputs.poetry-version }}-py${{ steps.setup-python.outputs.python-version }}
+          key: dotlocal-os_${{ runner.os }}-poetry${{ inputs.poetry-version }}-py${{ env.python_version }}
+
 
       - name: Print cache hit or miss
         run: echo "Cache dotlocal ${{ steps.cached-dotlocal.outputs.cache-hit }}"
@@ -42,7 +67,6 @@ runs:
       #------------------------------------------------#
       #       Set-up python & cache dependencies       #
       #------------------------------------------------#
-
       - name: Set up Python and cache poetry
         id: setup-python
         uses: actions/setup-python@v5
@@ -58,7 +82,7 @@ runs:
       # https://github.com/actions/setup-python/issues/846
       - run: poetry env use ${{ inputs.python-version }}
         shell: bash
-        # only if the python version is given as input
+        # only if the python version is clearly specified
         if: "${{ inputs.python-version != '' }}"
 
       #------------------------------------------------------------#
