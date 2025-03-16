@@ -23,24 +23,11 @@ runs:
       #----------------------------------------#
       #       Install & configure Poetry       #            
       #----------------------------------------#
-
-      - name: Fetch Python Version if not provided or is "latest"
-        uses: snok/latest-python-versions@v1
-        id: get-python-versions
-        with:
-          min-version: latest # Pick the latest version as minimum to get only the latest version
-        if: inputs.python-version == '' || inputs.python-version == 'latest'
-      
-      - name: Print (debug)
-        run: echo "${{ steps.get-python-versions.outputs.latest-python-versions }}"
-        shell: bash
-        if: inputs.python-version == '' || inputs.python-version == 'latest'
-      
       # set inputs.python-version to the latest python version
       - name: Set Python Version if version number not provided or is "latest"
         shell: bash
         run: |
-            latest_python=$(echo "${{ steps.determine-python.outputs.latest-python-versions }}" | jq -r '.[0]')
+            latest_python=$(curl -s https://raw.githubusercontent.com/actions/python-versions/main/versions-manifest.json | jq -r '.[0].version')
             echo "python_version=$latest_python" >> $GITHUB_ENV
         if: inputs.python-version == '' || inputs.python-version == 'latest'
 
@@ -49,6 +36,10 @@ runs:
         shell: bash
         run: echo "python_version=${{ inputs.python-version }}" >> $GITHUB_ENV
         if: "${{ ! (inputs.python-version == '' || inputs.python-version == 'latest') }}"
+
+      - name: Debug
+        shell: bash
+        run: echo "Python version - ${{ env.python_version }}"
 
       - name: Load cached .local
         id: cached-dotlocal
