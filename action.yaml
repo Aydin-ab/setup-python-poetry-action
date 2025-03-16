@@ -8,7 +8,6 @@ branding:
 inputs:
   python-version:
     description: Python version to use
-    default: latest
   poetry-version:
     description: Poetry version to use
     required: true
@@ -28,10 +27,11 @@ runs:
         shell: bash
         run: |
             latest_python=$(curl -s https://raw.githubusercontent.com/actions/python-versions/main/versions-manifest.json | jq -r '.[0].version')
+            # output is like 3.14.0-alpha.5 so we need to cut it to 3.14 (for example)
+            latest_python=$(echo $latest_python | cut -d '.' -f 1,2)
             echo "python_version=$latest_python" >> $GITHUB_ENV
-        if: inputs.python-version == '' || inputs.python-version == 'latest'
+        if: inputs.python-version == ''
 
-        
       - name: Set Python Version if version number provided
         shell: bash
         run: echo "python_version=${{ inputs.python-version }}" >> $GITHUB_ENV
@@ -64,7 +64,7 @@ runs:
         id: setup-python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ inputs.python-version }}
+          python-version: ${{ inputs.python-version }} # can handle '' by itself
           cache: 'poetry'
 
       - name: Print output python version
