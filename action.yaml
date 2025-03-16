@@ -32,6 +32,10 @@ runs:
           # use steps.setup-python.outputs.python-version so that if the provided python version is empty or "latest", it will use the appropriate version number
           key: dotlocal-os_${{ runner.os }}-poetry${{ inputs.poetry-version }}-py${{ steps.setup-python.outputs.python-version }}
 
+      - name: Print cache hit or miss
+        run: echo "Cache dotlocal ${{ steps.cached-dotlocal.outputs.cache-hit }}"
+        shell: bash
+
       - uses: snok/install-poetry@v1
         with:
           version: ${{ inputs.poetry-version }}
