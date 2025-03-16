@@ -35,8 +35,6 @@ runs:
       - uses: snok/install-poetry@v1
         with:
           version: ${{ inputs.poetry-version }}
-        # only if the cache didn't hit
-        if: steps.cached-dotlocal.outputs.cache-hit != 'true'
 
       #------------------------------------------------#
       #       Set-up python & cache dependencies       #
