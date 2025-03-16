@@ -10,7 +10,6 @@ inputs:
     description: Python version to use
   poetry-version:
     description: Poetry version to use
-    default: latest
     required: true
 
 runs:
@@ -45,10 +44,15 @@ runs:
       #------------------------------------------------#
 
       - name: Set up Python and cache poetry
+        id: setup-python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ inputs.python-version }}
           cache: 'poetry'
+
+      - name: Print output python version
+        run: echo "OUTPUT PYTHON VERSION ${{ steps.setup-python.outputs.python-version }}"
+        shell: bash
 
       # By default, poetry wil use the minimal required python in your .toml, so we need to manually set the python version
       # https://github.com/actions/setup-python/issues/846
