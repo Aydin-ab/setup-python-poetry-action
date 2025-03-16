@@ -27,6 +27,8 @@ runs:
       - name: Fetch Python Version if not provided or is "latest"
         uses: snok/latest-python-versions@v1
         id: get-python-versions
+        with:
+          min-version: latest # Pick the latest version as minimum to get only the latest version
         if: inputs.python-version == '' || inputs.python-version == 'latest'
       
       - name: Print (debug)
