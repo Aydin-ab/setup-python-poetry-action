@@ -28,15 +28,16 @@ runs:
         with:
           python-version: ${{ inputs.python-version }}
         if : inputs.python-version == ''
-      
-      - run: echo "OUTPUT  - ${{ steps.setup-python-temp.outputs }}"
-        shell: bash
 
       - name: Get resolved Python version
         id: get-python-version
         shell: bash
-        run: echo "python_version=${{ steps.setup-python-temp.outputs.python-version }}" >> $GITHUB_ENV
-        if : inputs.python-version == ''
+        run: |
+          if [[ -n "${{ inputs.python-version }}" ]]; then
+            echo "python_version=${{ inputs.python-version }}" >> $GITHUB_ENV
+          else
+            echo "python_version=$(python --version | cut -d ' ' -f2)" >> $GITHUB_ENV
+          fi
 
       - name: Set poetry version to latest if not specified
         shell: bash
