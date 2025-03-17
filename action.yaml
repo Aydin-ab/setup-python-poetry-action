@@ -29,7 +29,7 @@ runs:
           python-version: ${{ inputs.python-version }}
         if : inputs.python-version == ''
 
-      - name: Get resolved Python version
+      - name: Set resolved Python version
         id: get-python-version
         shell: bash
         run: |
@@ -49,23 +49,12 @@ runs:
             echo "poetry_version=$latest_poetry" >> $GITHUB_ENV
           fi
 
-      - name: Debug
-        shell: bash
-        run: | 
-          echo "Python version - ${{ env.python_version }}"
-          echo "Poetry version - ${{ env.poetry_version }}"
-
       - name: Load cached .local
         id: cached-dotlocal
         uses: actions/cache@v4
         with:
           path: ~/.local
           key: dotlocal-os_${{ runner.os }}-poetry${{ env.poetry_version }}-py${{ env.python_version }}
-
-
-      - name: Print cache hit or miss
-        run: echo "Cache dotlocal ${{ steps.cached-dotlocal.outputs.cache-hit }}"
-        shell: bash
 
       - uses: snok/install-poetry@v1
         with:
@@ -90,8 +79,4 @@ runs:
       #       Load cash dependencies or Install from scratch       #
       #------------------------------------------------------------#
       - run: poetry install --no-interaction
-        shell: bash
-
-      - name: "Python verison in poetry"
-        run: poetry run python --version
         shell: bash
