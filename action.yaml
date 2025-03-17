@@ -28,6 +28,9 @@ runs:
         with:
           python-version: ${{ inputs.python-version }}
         if : inputs.python-version == ''
+      
+      - run: echo "OUTPUT  - ${{ steps.setup-python-temp.outputs }}"
+        shell: bash
 
       - name: Get resolved Python version
         id: get-python-version
