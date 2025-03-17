@@ -1,14 +1,17 @@
 # **Setup Python with Poetry - GitHub Action** 🚀  
 
-This GitHub Action **sets up Python with Poetry**, ensuring that dependencies are cached for faster builds. It is designed for **projects using Poetry** as a dependency manager and helps simplify & speed up workflows by caching **both Poetry binaries and dependencies**.
+This GitHub Action **sets up Python with Poetry**, ensuring that the poetry binaries in .local/ and the dependencies are both cached for faster builds. It is designed for **projects using Poetry** as a dependency manager and helps simplify & speed up workflows by caching **both Poetry binaries and dependencies**.
+
+There is an additional checkout step at the start to further declutter the caller workflow.
 
 ---
 
 ## **📌 Features**
+✅ **Checkout to the caller github repo**
+✅ **Cache hit poetry binary (.local) or install it**
 ✅ **Installs Python** (any version)  
-✅ **Installs Poetry** if not found  
-✅ **Caches dependencies** using `poetry.lock`  
-✅ **Ensures the Poetry virtual environment is properly configured**  
+✅ **Caches poetry dependencies** using `poetry.lock`
+✅ **Ensures the Poetry virtual environment is properly configured to the right python**  
 ✅ **Supports all OS environments** (`ubuntu-latest`, `macos-latest`, `windows-latest`)  
 
 ---
@@ -16,7 +19,8 @@ This GitHub Action **sets up Python with Poetry**, ensuring that dependencies ar
 ## **📥 Inputs**
 | Name              | Description                                    | Required | Default |
 |------------------|--------------------------------|----------|---------|
-| `python-version` | The Python version to install | ✅ Yes   | None    |
+| `python-version` | The Python version to install |  No   | latest from the setup-python action    |
+| `poetry-version` | The Poetry version to install |  No   | latest release from pypi    | 
 
 ---
 
@@ -44,12 +48,13 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4  # ✅ Check out repository
+      # - uses: actions/checkout@v4  # No need anymore
       
       - name: Setup Python & Poetry
-        uses: your-username/setup-python-poetry@v1  # ✅ Use the GitHub Action
+        uses: aydin-ab/setup-python-poetry-action@v1.1.0  # ✅ Use the GitHub Action
         with:
-          python-version: "3.11"
+          python-version: "3.11" # optional
+          poetry-verison: "2.1" # optional
 
       - name: Verify Installation
         run: poetry run python --version
