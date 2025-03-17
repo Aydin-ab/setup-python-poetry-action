@@ -73,12 +73,12 @@ runs:
         id: setup-python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ env.poetry_version  }}
+          python-version: ${{ env.python_version  }}
           cache: 'poetry'
 
       # By default, poetry wil use the minimal required python in your .toml, so we need to manually set the python version
       # https://github.com/actions/setup-python/issues/846
-      - run: poetry env use ${{ env.poetry_version }}
+      - run: poetry env use ${{ env.python_version }}
         shell: bash
 
       #------------------------------------------------------------#
