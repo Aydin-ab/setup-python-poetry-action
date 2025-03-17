@@ -23,20 +23,27 @@ runs:
       #       Install & configure Poetry       #            
       #----------------------------------------#
       # set inputs.python-version to the latest python version
-      - name: Set Python Version if version number not provided or is "latest"
+      - name: Set python version to latest if not specified 
         shell: bash
         run: |
+          if [[ -n "${{ inputs.python-version }}" ]]; then
+            echo "python_version=${{ inputs.python-version }}" >> $GITHUB_ENV
+          else
             latest_python=$(curl -s https://raw.githubusercontent.com/actions/python-versions/main/versions-manifest.json | jq -r '.[0].version')
-            # output is like 3.14.0-alpha.5 so we need to cut it to 3.14 (for example)
             latest_python=$(echo $latest_python | cut -d '.' -f 1,2)
             echo "python_version=$latest_python" >> $GITHUB_ENV
-        if: inputs.python-version == ''
+          fi
 
-      - name: Set Python Version if version number provided
+      - name: Set poetry version to latest if not specified
         shell: bash
-        run: echo "python_version=${{ inputs.python-version }}" >> $GITHUB_ENV
-        if: "${{ ! (inputs.python-version == '' || inputs.python-version == 'latest') }}"
-
+        run: |
+          if [[ -n "${{ inputs.poetry-version }}" && "${{ inputs.poetry-version }}" != "latest" ]]; then
+            echo "poetry_version=${{ inputs.poetry-version }}" >> $GITHUB_ENV
+          else
+            latest_poetry=$(curl -s https://pypi.org/pypi/poetry/json | jq -r '.info.version')
+            echo "poetry_version=$latest_poetry" >> $GITHUB_ENV
+          fi
+          
       - name: Debug
         shell: bash
         run: echo "Python version - ${{ env.python_version }}"
