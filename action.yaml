@@ -43,17 +43,19 @@ runs:
             latest_poetry=$(curl -s https://pypi.org/pypi/poetry/json | jq -r '.info.version')
             echo "poetry_version=$latest_poetry" >> $GITHUB_ENV
           fi
-          
+
       - name: Debug
         shell: bash
-        run: echo "Python version - ${{ env.python_version }}"
+        run: | 
+          echo "Python version - ${{ env.python_version }}"
+          echo "Poetry version - ${{ env.poetry_version }}"
 
       - name: Load cached .local
         id: cached-dotlocal
         uses: actions/cache@v4
         with:
           path: ~/.local
-          key: dotlocal-os_${{ runner.os }}-poetry${{ inputs.poetry-version }}-py${{ env.python_version }}
+          key: dotlocal-os_${{ runner.os }}-poetry${{ env.poetry_version }}-py${{ env.python_version }}
 
 
       - name: Print cache hit or miss
@@ -62,7 +64,7 @@ runs:
 
       - uses: snok/install-poetry@v1
         with:
-          version: ${{ inputs.poetry-version }}
+          version: ${{ env.poetry_version }}
 
       #------------------------------------------------#
       #       Set-up python & cache dependencies       #
@@ -71,19 +73,13 @@ runs:
         id: setup-python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ inputs.python-version }} # can handle '' by itself
+          python-version: ${{ env.python-version }}
           cache: 'poetry'
-
-      - name: Print output python version
-        run: echo "OUTPUT PYTHON VERSION ${{ steps.setup-python.outputs.python-version }}"
-        shell: bash
 
       # By default, poetry wil use the minimal required python in your .toml, so we need to manually set the python version
       # https://github.com/actions/setup-python/issues/846
-      - run: poetry env use ${{ inputs.python-version }}
+      - run: poetry env use ${{ env.python-version }}
         shell: bash
-        # only if the python version is clearly specified
-        if: "${{ inputs.python-version != '' }}"
 
       #------------------------------------------------------------#
       #       Load cash dependencies or Install from scratch       #
