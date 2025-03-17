@@ -22,17 +22,18 @@ runs:
       #----------------------------------------#
       #       Install & configure Poetry       #            
       #----------------------------------------#
-      # set inputs.python-version to the latest python version
-      - name: Set python version to latest if not specified 
+      - name: Set up Python (temporary)
+        id: setup-python-temp
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+        if : inputs.python-version == ''
+
+      - name: Get resolved Python version
+        id: get-python-version
         shell: bash
-        run: |
-          if [[ -n "${{ inputs.python-version }}" ]]; then
-            echo "python_version=${{ inputs.python-version }}" >> $GITHUB_ENV
-          else
-            latest_python=$(curl -s https://raw.githubusercontent.com/actions/python-versions/main/versions-manifest.json | jq -r '.[0].version')
-            latest_python=$(echo $latest_python | cut -d '.' -f 1,2)
-            echo "python_version=$latest_python" >> $GITHUB_ENV
-          fi
+        run: echo "python_version=${{ steps.setup-python-temp.outputs.python-version }}" >> $GITHUB_ENV
+        if : inputs.python-version == ''
 
       - name: Set poetry version to latest if not specified
         shell: bash
