@@ -7,12 +7,12 @@ There is an additional checkout step at the start to further declutter the calle
 ---
 
 ## **📌 Features**
-✅ **Checkout to the caller github repo**
-✅ **Cache hit poetry binary (.local) or install it**
-✅ **Installs Python** (any version)  
-✅ **Caches poetry dependencies** using `poetry.lock`
-✅ **Ensures the Poetry virtual environment is properly configured to the right python**  
-✅ **Supports all OS environments** (`ubuntu-latest`, `macos-latest`, `windows-latest`)  
+- ✅ **Checkout to the caller github repo**
+- ✅ **Cache hit poetry binary (.local) or install it**
+- ✅ **Installs Python** (any version)  
+- ✅ **Caches poetry dependencies** using `poetry.lock`
+- ✅ **Ensures the Poetry virtual environment is properly configured to the right python**  
+- ✅ **Supports all OS environments** (`ubuntu-latest`, `macos-latest`, `windows-latest`)  
 
 ---
 
@@ -63,38 +63,13 @@ jobs:
 ---
 
 ## **🛠 How It Works**
-1. **Installs Poetry** if not already available.
-2. **Sets up Python** (using `actions/setup-python`).
-3. **Caches Poetry dependencies** to avoid redundant installations.
-4. **Configures the Poetry's version of Python** (`poetry env use <version>`).
-5. **Installs project dependencies** using `poetry install`.
+1. **Checkout to the github repo**
+2. **Set python/poetry version if not provided as inputs**
+3. **Installs Poetry** or load binaries (at ~/.local) from cache if not already available.
+4. **Sets up Python** (using `actions/setup-python`).
+5. **Configures the Poetry's version of Python** (`poetry env use <version>`).
+6. **Install Poetry dependencies** or load dependencies from cache if not already available. (cached by `actions/setup-python`)
 
----
-
-## **📦 How to Use with a Cached Virtual Environment**
-If you want to **cache the virtual environment (`.venv`)** for faster builds:
-
-```yaml
-jobs:
-  setup:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Restore Cached Virtual Environment
-        uses: actions/cache@v4
-        with:
-          path: .venv
-          key: venv-${{ runner.os }}-${{ hashFiles('poetry.lock') }}
-
-      - name: Setup Python & Poetry
-        uses: your-username/setup-python-poetry@v1
-        with:
-          python-version: "3.11"
-
-      - name: Run Tests
-        run: poetry run pytest
-```
 
 ---
 
